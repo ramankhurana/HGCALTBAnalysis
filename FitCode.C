@@ -20,7 +20,7 @@ void SaveGraphs(  TString energy = "250"){
   double width_corr[7], cell_corr[7];
   TCanvas *c1 = new TCanvas ("c1","c1", 700, 500);
   TF1 *fgaus;
-
+  
 
   //TDCx Vs TDCy
   for (int j=17; j<=23; j++){
@@ -226,18 +226,26 @@ void SaveGraphs(  TString energy = "250"){
   c1->SaveAs(dirname+"/resolution_correctedVsCell.pdf");
   fout->cd();  
   gr->Write();  
+
+
+  ofstream ftext;
+  ftext.open("Resolution.txt");
+  for (int i=0; i<=6; i++){
+    ftext<<    cell_corr[i]  << " " << energy <<" "<<width_corr[i]<<std::endl;
+  }
+
   //return width_corr;
 }
 
 void FitCode(){
   std::vector<TString> energyList;
   energyList.clear();
-  //  energyList.push_back("20");
-  //energyList.push_back("32");
-  //energyList.push_back("50");
-  //energyList.push_back("100");
-  //energyList.push_back("150");
-  //energyList.push_back("200");
+  energyList.push_back("20");
+  energyList.push_back("32");
+  energyList.push_back("50");
+  energyList.push_back("100");
+  energyList.push_back("150");
+  energyList.push_back("200");
   energyList.push_back("250");
   //float* resol;
 

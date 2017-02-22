@@ -15,9 +15,9 @@ class cellInfo:
     time_ = -999.
     time_correct_ = -999.
     time_calibrate_ = -999.
-    amplitude = -999.
-    integral = -999.
-    isneighbour = False
+    amplitude_ = -999.
+    integral_ = -999.
+    isneighbour_ = False
     def __init__(self):
         self.tdcx = -999.
 
