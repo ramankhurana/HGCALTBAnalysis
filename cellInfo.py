@@ -17,7 +17,11 @@ class cellInfo:
     time_calibrate_ = -999.
     amplitude_ = -999.
     integral_ = -999.
+    offset_ = -999.
+    time_offsetCorrected_ = -999.
+    timeGaussPeak = -999.
     isneighbour_ = False
+    
     def __init__(self):
         self.tdcx = -999.
 

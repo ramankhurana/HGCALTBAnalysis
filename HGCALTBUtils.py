@@ -60,12 +60,7 @@ def SetNeighbourFlag(sorted_ring1):
         centercell = sorted_ring1[0].icell
         sorted_ring1[0].isneighbour_ = True
         for icell in range(1,len(sorted_ring1)):
-            print 'icell inside loop',sorted_ring1[icell].icell
             sorted_ring1[icell].isneighbour_ = bool(nhbr.isNeighbour(centercell, sorted_ring1[icell].icell))
-            if (nhbr.isNeighbour(centercell, sorted_ring1[icell].icell)):
-                print (sorted_ring1[icell].icell, 'is neighbour of center cell ', centercell)
-            else: 
-                print (sorted_ring1[icell].icell, 'is **NOT** neighbour of center cell ', centercell)
     return sorted_ring1
 
 def FilterRing(sorted_ring1):
@@ -86,12 +81,12 @@ def LinearEnergyWeightedTime(filtered_ring1):
     totalT = 0.0
     for icell in range(len(filtered_ring1)):
         iamp = filtered_ring1[icell].amplitude_
-        itime = filtered_ring1[icell].time_calibrate_
+        itime = filtered_ring1[icell].time_offsetCorrected_
         product1_ = iamp * (itime)
         sum1_  =  sum1_ + product1_
         sum2_ = sum2_ + iamp
     ## end of for loop
-    if len(filtered_ring1) > 0: totalT = sum1_ / sum2_
+    if len(filtered_ring1) > 0: totalT =  filtered_ring1[0].timeGaussPeak - (sum1_ / sum2_)
     else:  totalT = -99. 
     print 'totalT = ', totalT
     return totalT

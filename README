@@ -1,0 +1,12 @@
+## You can use following command to analyse the RECO TB trees and save many Histograms for further analysis. 
+python HGCALTBAnalyzer.py 
+
+## This will loop over the files in a directory and run on each of the files in this directory. You have to give file path in the "inputrootfiles.txt" 
+
+## You can use the output to get the offset factors for each cell. This is done using just one single histogram (TH3D) with X axis: amplitude, Y axis: time, Z axis: cell number 
+
+## 
+
+
+
+## You can run the following command to save all the fit plots in a directory for each energy point and some more plots which are used to interpret the results. 
