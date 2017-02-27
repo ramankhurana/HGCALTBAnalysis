@@ -1,9 +1,10 @@
+
 import os
 import sys
 import math
 from ROOT import *
 
-txtfile = open('Resolution.txt','read')
+txtfile = open('data/Resolution_250.txt','read')
 
 a=[]
 b=[]
@@ -20,46 +21,48 @@ for line in txtfile:
     
 
 from array import array
+
 def makewidthgraph(cell_):
     energy =  array( 'd' )
     resolution= array( 'd' )
     gr=TGraph()
+    #gr=[]
     for icell in range(len(a)):
         if a[icell] == cell_:
             energy.append(float(b[icell]))
             resolution.append(float(c[icell]))
-            print (len(a),"  ", energy, "  ",resolution)
-        gr = TGraph(len(energy), energy, resolution)
+        print (len(a),"  ", energy, "  ",resolution)
+    gr = TGraph(len(energy), energy, resolution)
     return gr
 
-from array import array
-def makeresolutiongraph(cell_):
-    energy =  array( 'd' )
-    resolution= array( 'd' )
-    gr1=TGraph()
-    for icell in range(len(a)):
-        if a[icell] == cell_:
-            energy.append(float(b[icell]))
-            resolution.append(float(d[icell]))
-            print (len(a),"  ", energy, "  ",resolution)
-        gr1 = TGraph(len(energy), energy, resolution)
-    return gr1
+#from array import array
+#def makeresolutiongraph(cell_):
+#    energy1 =  array( 'd' )
+#    resolution1= array( 'd' )
+#    gr1=TGraph()
+#    for icell in range(len(a)):
+#        if a[icell] == cell_:
+#            energy1.append(float(b[icell]))
+#            resolution1.append(float(d[icell]))
+#            print (len(a),"  ", energy1, "  ",resolution1)
+#        gr1 = TGraph(len(energy1), energy1, resolution1)
+#    return gr1
 
 
 
 rootfile =TFile('ResolutionPlot.root','recreate')
-for icell in range(17,24):
+for icell in range(17,19):
     mg = makewidthgraph(str(icell))
-    histoname ='AmpcutVsOffset_cell_'+str(icell)
-    mg.SetNameTitle(histoname,histoname)
+    #histoname ='AmpcutVsOffset_cell_'+str(icell)
+    #mg.SetNameTitle(histoname,histoname)
 
-    mg1 = makeresolutiongraph(str(icell))
-    histoname1 ='AmpcutVsRMS_cell_'+str(icell)
-    mg1.SetNameTitle(histoname1,histoname1)
+ #   mg1 = makeresolutiongraph(str(icell))
+ #   histoname1 ='AmpcutVsRMS_cell_'+str(icell)
+ #   mg1.SetNameTitle(histoname1,histoname1)
 
-    rootfile.cd()
-    mg.Write()
-    mg1.Write()
+    #rootfile.cd()
+    #mg.Write()
+ #   mg1.Write()
    
 
 

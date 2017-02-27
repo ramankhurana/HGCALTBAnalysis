@@ -47,8 +47,6 @@ debug_ = False
 treeName = 't1065'
 textfilename = 'inputrootfiles.txt'
 outputfilename = ''
-calibrationtextfile = 'data/Resolution.txt'
-calib = calibrationReader(calibrationtextfile)
 
 ##
 ## This part of code will get the calibration constants. 
@@ -74,11 +72,11 @@ amplitudeCut=[0.05, 0.1, 0.15, 0.2, 0.25]
 ##
 ## Analyse function: This will call all other functions needed and manage them. 
 ##   
-def analyze(timingTree, allhisto_, ampCutIndex):
+def analyze(timingTree, allhisto_, ampCutIndex, calib):
     NEntries = timingTree.GetEntries()
     if debug_: print "NEntries = ",NEntries
-    for ievent in range(1000):
-        if ievent%1 ==0: print ievent
+    for ievent in range(NEntries):
+        if ievent%1 ==100: print ievent
         timingTree.GetEntry(ievent)
         tt_event                        = timingTree.__getattr__('event') # UInt_t
         tt_ngroups                      = timingTree.__getattr__('ngroups') # UInt_t
@@ -141,12 +139,12 @@ def analyze(timingTree, allhisto_, ampCutIndex):
                 time_ = tt_linearTime45_corrected[icell] 
                 
                 #print ('-------------------------------',cellnumber, str(amplitudeCut[ampCutIndex]))
-                print ('-------------------------------',cellnumber, ampCutIndex)
+                if debug_: print ('-------------------------------',cellnumber, ampCutIndex)
                 offsetList    = (calib.CalibationFactor(cellnumber, str(amplitudeCut[ampCutIndex]) ))
-                print "offset list", offsetList
+                if debug_: print "offset list", offsetList
                 
                 ## correct for offset 
-                print "offset =============================================== ", offsetList[0]
+                if debug_:  print "offset =============================================== ", offsetList[0]
                 time_calibrated = time_ - float(offsetList[0])
                 
                 ## fill timing information in a given range
@@ -154,6 +152,9 @@ def analyze(timingTree, allhisto_, ampCutIndex):
                 
                 ## fill the corrected timing info
                 allhisto_['timecorrected_'+cellnumber].Fill(time_calibrated)
+                
+                allhisto_['timeOffsetcorrected_'+cellnumber].Fill(tt_linearTime45[icell] + float(offsetList[0]))
+                
                 
                 
                 ## 2D histograms 
@@ -176,7 +177,7 @@ def analyze(timingTree, allhisto_, ampCutIndex):
                 ci.time_correct_            = time_
                 ci.time_calibrate_          = time_calibrated
                 ci.offset_                  = float(offsetList[0])
-                ci.time_offsetCorrected_    = tt_linearTime45[icell] - float(offsetList[0])
+                ci.time_offsetCorrected_    = tt_linearTime45[icell] + float(offsetList[0])
                 ci.amplitude_               = tt_amp[icell]
                 ci.integral_                = tt_int[icell]
                 
@@ -194,7 +195,7 @@ def analyze(timingTree, allhisto_, ampCutIndex):
         info_ring1.sort(key=operator.attrgetter('amplitude'))
         '''
         
-        print 'size of list before cleaning is ', len(sorted_ring1)
+        ##print 'size of list before cleaning is ', len(sorted_ring1)
         
         ## set the flags about the neighbours for each cell in the event 
         sorted_ring1 = SetNeighbourFlag(sorted_ring1)
@@ -202,7 +203,7 @@ def analyze(timingTree, allhisto_, ampCutIndex):
         ## remove the cells which are not neighbour 
         filtered_ring1 = FilterRing(sorted_ring1)
         
-        print 'size of list after cleaning is ', len(filtered_ring1)
+        ##print 'size of list after cleaning is ', len(filtered_ring1)
         
         ## calculate linear energy weighted time 
         totalT = LinearEnergyWeightedTime(filtered_ring1)
@@ -231,6 +232,11 @@ if __name__ == "__main__":
     ## make one rootfile for each input file. 
     ## TChain should be inside loop becuase sequence has to run on each rootfile and give one output rootfile instead of one big rootfile. 
     for ifile in infile:
+        E  = beamEnergy(ifile)
+        x0 = RadiationLength(ifile)
+        calibrationtextfile = 'data/Resolution_'+E+'.txt'
+        calib = calibrationReader(calibrationtextfile)
+                
         timingTree_ = TChain(treeName)
         timingTree_.Add(ifile.rstrip())
         outputfilename = StripRootFileName(ifile.rstrip())
@@ -238,14 +244,14 @@ if __name__ == "__main__":
         ## Run in extracting mode 
         if options.extractOffsetMode: 
             allhisto_  = defineHistograms()
-            allhistoFilled_  = analyze(timingTree_, allhisto_,0)
+            allhistoFilled_  = analyze(timingTree_, allhisto_,0, calib)
             WriteHistograms(allhistoFilled_, outputfilename,"RECREATE")
 
         ## Run in applying the offset mode 
         if options.applyOffsetMode: 
             for iamp in range(len(amplitudeCut)):
                 allhisto_  = defineHistograms('_Amp_'+str(iamp))
-                allhistoFilled_  = analyze(timingTree_, allhisto_,iamp)
+                allhistoFilled_  = analyze(timingTree_, allhisto_,iamp, calib)
                 if iamp==0:
                     WriteHistograms(allhistoFilled_, outputfilename,"RECREATE")
                 else:

@@ -4,10 +4,10 @@ void SaveGraphs(  TString energy = "250"){
 
   TString filename = "histogramsRootFile/electrons_"+energy+"_GeV_5_7_X0.root";
   cout << filename <<std::endl;
-  TString dirname = "DirResolutionPerCell_"+energy;
+  TString dirname = "histogramsPDF/DirResolutionPerCell_"+energy;
   gSystem->Exec("mkdir "+dirname);
   
-  TString fileout = "Output_"+energy+".root";
+  TString fileout = "histogramsRootFile/Output_"+energy+".root";
   TFile *fout = new TFile(fileout,"recreate");
   TFile *f1 = new TFile(filename,"open");
   f1->cd();
@@ -61,7 +61,7 @@ void SaveGraphs(  TString energy = "250"){
       projectionh->Draw();
       cellnumber__.Form("%d",i);
       nameofhisto = histo2D+"_Cell_"+cellnumber+"_Amp_"+cellnumber__;
-      c1->SaveAs(dirname+"/"+nameofhisto+".png");
+      c1->SaveAs(dirname+"/"+nameofhisto+".pdf");
     }
     
     TGraph* gr = new TGraph(5,cell,width);
@@ -70,7 +70,7 @@ void SaveGraphs(  TString energy = "250"){
     gr->GetXaxis()->SetTitle("Cell ");
     gr->GetYaxis()->SetTitle("Resolution");
     
-    c1->SaveAs(dirname+"/resolutionVsCell_"+cellnumber+".png");
+    c1->SaveAs(dirname+"/resolutionVsCell_"+cellnumber+".pdf");
     fout->cd();  
     gr->Write();  
 
@@ -80,7 +80,7 @@ void SaveGraphs(  TString energy = "250"){
     grmean->GetXaxis()->SetTitle("Cell ");
     grmean->GetYaxis()->SetTitle("Mean");
     
-    c1->SaveAs(dirname+"/MeanValue_"+cellnumber+".png");
+    c1->SaveAs(dirname+"/MeanValue_"+cellnumber+".pdf");
     fout->cd();  
     grmean->Write();
   }

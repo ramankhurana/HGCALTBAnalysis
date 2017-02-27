@@ -2,7 +2,7 @@ void SaveGraphs(  TString energy = "250"){
 
   
 
-  TString filename = "electrons_"+energy+"_GeV_5_7_X0.root";
+  TString filename = "histogramsRootFile/electrons_"+energy+"_GeV_5_7_X0.root";
   cout << filename <<std::endl;
   TString dirname = "Dir_"+energy;
   gSystem->Exec("mkdir "+dirname);
@@ -11,7 +11,7 @@ void SaveGraphs(  TString energy = "250"){
   TFile *fout = new TFile(fileout,"recreate");
   TFile *f1 = new TFile(filename,"open");
   f1->cd();
-  TString cellnumber, histoname;
+  TString cellnumber, histoname ,ampval;
   TString histo2D;
   double range_min, range_max,x;
   int binmax;
@@ -23,92 +23,114 @@ void SaveGraphs(  TString energy = "250"){
   
 
   //TDCx Vs TDCy
-  for (int j=17; j<=23; j++){
-    cellnumber.Form("%d",j);
-    histo2D = "TDCxVsTDCy_withAmpCut_"+cellnumber;
+  for (int iamp=0; iamp<5; iamp++){
+    for (int j=17; j<=23; j++){
+      cellnumber.Form("%d",j);
+      ampval.Form("%d",iamp);
+      
+      histo2D = "TDCxVsTDCy_withAmpCut_"+cellnumber+"_Amp_"+ampval;
+      std::cout<<" histo2D = "<<histo2D<<std::endl;
+      TH2F *h4 = (TH2F*) f1->Get(histo2D);
+      
+      c1->cd();
+      h4->GetXaxis()->SetTitle("TDCx");
+      h4->GetYaxis()->SetTitle("TDCy");
+            
+      h4->Draw("colz");
+      c1->SaveAs(dirname+"/"+histo2D+".pdf");
+      
+    }
+  }
+
+  //TDCx Vs time
+  for (int iamp=0; iamp<5; iamp++){
+    for (int j=17; j<=23; j++){
+      cellnumber.Form("%d",j);
+      ampval.Form("%d",iamp);
+      
+      histo2D = "h2_TDCx_vs_time_"+cellnumber+"_Amp_"+ampval;
+      TH2F *h4 = (TH2F*) f1->Get(histo2D);
+      c1->cd();
+      h4->GetXaxis()->SetTitle("TDCx");
+      h4->GetYaxis()->SetTitle("time");
+      h4->Draw("colz");
+      c1->SaveAs(dirname+"/"+histo2D+".pdf");
+      
+    }
+  }
+
+  //TDCy Vs time
+  for (int iamp=0; iamp<5; iamp++){
+    for (int j=17; j<=23; j++){
+      cellnumber.Form("%d",j);
+      ampval.Form("%d",iamp);
+      
+      histo2D = "h2_TDCy_vs_time_"+cellnumber+"_Amp_"+ampval;
+      TH2F *h4 = (TH2F*) f1->Get(histo2D);
+      c1->cd();
+      h4->GetXaxis()->SetTitle("TDCy");
+      h4->GetYaxis()->SetTitle("time");
+      h4->Draw("colz");
+      c1->SaveAs(dirname+"/"+histo2D+".pdf");
+    }
+  }
+
+
+  //TDCx Vs amp
+  for (int iamp=0; iamp<5; iamp++){
+    for (int j=17; j<=23; j++){
+      cellnumber.Form("%d",j);
+      ampval.Form("%d",iamp);
+
+      histo2D = "h2_TDCx_vs_amp_"+cellnumber+"_Amp_"+ampval;
+      TH2F *h4 = (TH2F*) f1->Get(histo2D);
+      c1->cd();
+      h4->GetXaxis()->SetTitle("TDCx");
+      h4->GetYaxis()->SetTitle("amp");
+      h4->Draw("colz");
+      c1->SaveAs(dirname+"/"+histo2D+".pdf");
+    } 
+  }
+
+
+  //TDCx Vs amp
+  for (int iamp=0; iamp<5; iamp++){
+    for (int j=17; j<=23; j++){
+      cellnumber.Form("%d",j);
+      ampval.Form("%d",iamp);
+      histo2D = "h2_TDCy_vs_amp_"+cellnumber+"_Amp_"+ampval;
+      std::cout<<" histo2D = "<<histo2D<<std::endl;
+      TH2F *h4 = (TH2F*) f1->Get(histo2D);
+      c1->cd();
+      h4->GetXaxis()->SetTitle("TDCy");
+      h4->GetYaxis()->SetTitle("amp");
+      h4->Draw("colz");
+      c1->SaveAs(dirname+"/"+histo2D+".pdf");
+      std::cout<<" histo saved for"<<histo2D<<std::endl;
+    } 
+  }
+
+  /*
+  for (int iamp=0; iamp<5; iamp++){
+    ampval.Form("%d",iamp);
+    histo2D = "TDCmap"+cellnumber+"_Amp_"+ampval;
     TH2F *h4 = (TH2F*) f1->Get(histo2D);
     c1->cd();
     h4->GetXaxis()->SetTitle("TDCx");
     h4->GetYaxis()->SetTitle("TDCy");
-    //    h4->SetOptStat(0);
-
+    //h4->SetOptStat(000000);
     h4->Draw("colz");
     c1->SaveAs(dirname+"/"+histo2D+".pdf");
-
+    
+    gStyle->SetOptStat(111111);
+    gROOT->ForceStyle(); 
   }
 
-  //TDCx Vs time
-  for (int j=17; j<=23; j++){
-    cellnumber.Form("%d",j);
-    histo2D = "h2_TDCx_vs_time_"+cellnumber;
-    TH2F *h4 = (TH2F*) f1->Get(histo2D);
-    c1->cd();
-    h4->GetXaxis()->SetTitle("TDCx");
-    h4->GetYaxis()->SetTitle("time");
-    h4->Draw("colz");
-    c1->SaveAs(dirname+"/"+histo2D+".pdf");
-
-  }
-
-  //TDCy Vs time
-  for (int j=17; j<=23; j++){
-    cellnumber.Form("%d",j);
-    histo2D = "h2_TDCy_vs_time_"+cellnumber;
-    TH2F *h4 = (TH2F*) f1->Get(histo2D);
-    c1->cd();
-    h4->GetXaxis()->SetTitle("TDCy");
-    h4->GetYaxis()->SetTitle("time");
-    h4->Draw("colz");
-    c1->SaveAs(dirname+"/"+histo2D+".pdf");
-
-  }
-
-
-  //TDCx Vs amp
-  for (int j=17; j<=23; j++){
-    cellnumber.Form("%d",j);
-    histo2D = "h2_TDCx_vs_amp_"+cellnumber;
-    TH2F *h4 = (TH2F*) f1->Get(histo2D);
-    c1->cd();
-    h4->GetXaxis()->SetTitle("TDCx");
-    h4->GetYaxis()->SetTitle("amp");
-    h4->Draw("colz");
-    c1->SaveAs(dirname+"/"+histo2D+".pdf");
-
-  }
-
-
-  //TDCx Vs amp
-  for (int j=17; j<=23; j++){
-    cellnumber.Form("%d",j);
-    histo2D = "h2_TDCy_vs_amp_"+cellnumber;
-    TH2F *h4 = (TH2F*) f1->Get(histo2D);
-    c1->cd();
-    h4->GetXaxis()->SetTitle("TDCy");
-    h4->GetYaxis()->SetTitle("amp");
-    h4->Draw("colz");
-    c1->SaveAs(dirname+"/"+histo2D+".pdf");
-
-  }
-
-
-
-
-  TH2F *h4 = (TH2F*) f1->Get("TDCmap_");
-  c1->cd();
-  h4->GetXaxis()->SetTitle("TDCx");
-  h4->GetYaxis()->SetTitle("TDCy");
-  //h4->SetOptStat(000000);
-  h4->Draw("colz");
-  c1->SaveAs(dirname+"/TDCMap_.pdf");
-
-  gStyle->SetOptStat(111111);
-  gROOT->ForceStyle(); 
-
-
-
+  */
   //Total Time resolution
-    histoname = "h_Totaltime";
+  for (int iamp=0; iamp<5; iamp++){
+    ampval.Form("%d",iamp);
+    histoname = "h_Totaltime_Amp_" + ampval ;
     TH1F *h2 = (TH1F*) f1->Get(histoname);
     
     binmax = h2->GetMaximumBin();
@@ -124,7 +146,7 @@ void SaveGraphs(  TString energy = "250"){
     c1->SaveAs(dirname+"/"+histoname+".pdf");
 
     // Quad
-    histoname = "h_Totaltime_Quad";
+    histoname = "h_Totaltime_Quad_Amp_"+ampval;
     TH1F *h2 = (TH1F*) f1->Get(histoname);
     
     binmax = h2->GetMaximumBin();
@@ -142,7 +164,7 @@ void SaveGraphs(  TString energy = "250"){
     
     // Log
 
-    histoname = "h_Totaltime_Log";
+    histoname = "h_Totaltime_Log_Amp_"+ampval;
     TH1F *h2 = (TH1F*) f1->Get(histoname);
     
     binmax = h2->GetMaximumBin();
@@ -153,79 +175,96 @@ void SaveGraphs(  TString energy = "250"){
     fgaus = new TF1("fgaus","gaus",range_min,range_max);
     h2->GetXaxis()->SetRangeUser(x-0.2,x+0.2);
     h2->Fit("fgaus","R");
-    c1->cd();
-    gStyle->SetOptFit(1111111); 
-    h2->Draw();
-    c1->SaveAs(dirname+"/"+histoname+".pdf");
-  
-
-  for ( int i = 17; i <= 23; i++){
-    par[0] =  par[1]= par[2] = 0;
-    cellnumber.Form("%d",i);
-    histoname = "TimePlot_"+cellnumber;
-    TH1F *h2 = (TH1F*) f1->Get(histoname);
-    
-    binmax = h2->GetMaximumBin();
-    x = h2->GetXaxis()->GetBinCenter(binmax);  
-    range_min = x - (2*h2->GetRMS());
-    range_max = x + (2*h2->GetRMS());
-    
-    fgaus = new TF1("fgaus","gaus",range_min,range_max);
-    h2->GetXaxis()->SetRangeUser(x-0.2,x+0.2);
-    h2->Fit("fgaus","R");
-    fgaus->GetParameters(&par[0]);
-    cell[i-17] = i ;
-    width[i-17] = par[2];
-    c1->cd();
-    gStyle->SetOptFit(1111111); 
-    h2->Draw();
-        
-    c1->SaveAs(dirname+"/"+histoname+".pdf");
-  }
-
-  
-
-  for ( int i = 17; i <= 23; i++){
-    par[0] =  par[1]= par[2] = 0;
-    cellnumber.Form("%d",i);
-    histoname = "TimeCorrected_"+cellnumber;
-    TH1F *h2 = (TH1F*) f1->Get(histoname);
-    
-    binmax = h2->GetMaximumBin();
-    x = h2->GetXaxis()->GetBinCenter(binmax);  
-    range_min = x - (2*h2->GetRMS());
-    range_max = x + (2*h2->GetRMS());
-    fgaus = new TF1("fgaus","gaus",range_min,range_max);
-    h2->GetXaxis()->SetRangeUser(x-0.2,x+0.2);
-    h2->Fit("fgaus","R");
-    fgaus->GetParameters(&par[0]);
-    cell_corr[i-17] = i ;
-    width_corr[i-17] = par[2];
     c1->cd();
     gStyle->SetOptFit(1111111); 
     h2->Draw();
     c1->SaveAs(dirname+"/"+histoname+".pdf");
   }
-
-  int n = 7;
-  TGraph* gr = new TGraph(n,cell,width);
-  c1->cd();
-  gr->Draw("AC*");
-  gr->GetXaxis()->SetTitle("Cell Number");
-  gr->GetYaxis()->SetTitle("Resolution");
   
-  c1->SaveAs(dirname+"/resolutionVsCell.pdf");
-  fout->cd();  
-  gr->Write();  
 
-  TGraph* gr = new TGraph(n,cell_corr,width_corr);
-  c1->cd();
-  gr->Draw("AC*");
-  gr->GetXaxis()->SetTitle("Cell Number");
-  gr->GetYaxis()->SetTitle("Resolution");
-  c1->SaveAs(dirname+"/resolution_correctedVsCell.pdf");
-  fout->cd();  
-  gr->Write();  
+  for (int iamp=0; iamp<5; iamp++){
+    for ( int i = 17; i <= 23; i++){
+      ampval.Form("%d",iamp);
+      
+      par[0] =  par[1]= par[2] = 0;
+      cellnumber.Form("%d",i);
+      histoname = "TimePlot_"+cellnumber+"_Amp_" + ampval;
+      TH1F *h2 = (TH1F*) f1->Get(histoname);
+      
+      binmax = h2->GetMaximumBin();
+      x = h2->GetXaxis()->GetBinCenter(binmax);  
+      range_min = x - (2*h2->GetRMS());
+      range_max = x + (2*h2->GetRMS());
+      
+      fgaus = new TF1("fgaus","gaus",range_min,range_max);
+      h2->GetXaxis()->SetRangeUser(x-0.2,x+0.2);
+      h2->Fit("fgaus","R");
+      fgaus->GetParameters(&par[0]);
+      cell[i-17] = i ;
+      width[i-17] = par[2];
+      c1->cd();
+      gStyle->SetOptFit(1111111); 
+      h2->Draw();
+      
+      c1->SaveAs(dirname+"/"+histoname+".pdf");
+    }
+    
+    int n = 7;
+    TGraph* gr = new TGraph(n,cell,width);
+    c1->cd();
+    gr->Draw("AC*");
+    gr->GetXaxis()->SetTitle("Cell Number");
+    gr->GetYaxis()->SetTitle("Resolution");
+    gr->SetNameTitle("resolutionVsCell_Amp_" + ampval , "resolutionVsCell_Amp_" + ampval);
+    c1->SaveAs(dirname+"/resolutionVsCell_Amp_" + ampval+".pdf");
+    fout->cd();  
+    gr->Write();  
+
+  }
+  
+
+  for (int iamp=0; iamp<5; iamp++){
+    
+    for ( int i = 17; i <= 23; i++){
+      ampval.Form("%d",iamp);
+      par[0] =  par[1]= par[2] = 0;
+      cellnumber.Form("%d",i);
+  
+      histoname = "TimeCorrected_"+cellnumber+"_Amp_" + ampval;
+      
+      TH1F *h2 = (TH1F*) f1->Get(histoname);
+      
+      binmax = h2->GetMaximumBin();
+      x = h2->GetXaxis()->GetBinCenter(binmax);  
+      range_min = x - (2*h2->GetRMS());
+      range_max = x + (2*h2->GetRMS());
+      fgaus = new TF1("fgaus","gaus",range_min,range_max);
+      h2->GetXaxis()->SetRangeUser(x-0.2,x+0.2);
+      h2->Fit("fgaus","R");
+      fgaus->GetParameters(&par[0]);
+      cell_corr[i-17] = i ;
+      width_corr[i-17] = par[2];
+      c1->cd();
+      gStyle->SetOptFit(1111111); 
+      h2->Draw();
+      c1->SaveAs(dirname+"/"+histoname+".pdf");
+    }
+    
+    
+    int n = 7;
+    TGraph* gr = new TGraph(n,cell_corr,width_corr);
+    c1->cd();
+    gr->Draw("AC*");
+    gr->GetXaxis()->SetTitle("Cell Number");
+    gr->GetYaxis()->SetTitle("Resolution");
+    gr->SetNameTitle("resolution_correctedVsCell_Amp_" + ampval , "resolution_correctedVsCell_Amp_" + ampval);
+    c1->SaveAs(dirname+"/resolution_correctedVsCell_Amp_" + ampval+".pdf");
+    c1->SaveAs(dirname+"/resolution_correctedVsCell.pdf");
+    fout->cd();  
+    gr->Write();  
+  
+  }
+  
 
 
   ofstream ftext;
