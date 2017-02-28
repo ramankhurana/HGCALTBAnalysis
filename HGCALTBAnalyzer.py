@@ -245,7 +245,7 @@ if __name__ == "__main__":
         if options.extractOffsetMode: 
             allhisto_  = defineHistograms()
             allhistoFilled_  = analyze(timingTree_, allhisto_,0, calib)
-            WriteHistograms(allhistoFilled_, outputfilename,"RECREATE")
+            WriteHistograms(allhistoFilled_, outputfilename,"RECREATE","histogramsOffSetExtraction")
 
         ## Run in applying the offset mode 
         if options.applyOffsetMode: 
@@ -253,8 +253,8 @@ if __name__ == "__main__":
                 allhisto_  = defineHistograms('_Amp_'+str(iamp))
                 allhistoFilled_  = analyze(timingTree_, allhisto_,iamp, calib)
                 if iamp==0:
-                    WriteHistograms(allhistoFilled_, outputfilename,"RECREATE")
+                    WriteHistograms(allhistoFilled_, outputfilename,"RECREATE","histogramsRootFile")
                 else:
-                    WriteHistograms(allhistoFilled_, outputfilename,"UPDATE")
+                    WriteHistograms(allhistoFilled_, outputfilename,"UPDATE","histogramsRootFile")
 
 
