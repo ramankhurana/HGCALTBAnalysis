@@ -34,6 +34,13 @@ def RadiationLength(filename):
     return x0
 
 
-print 'energy=', beamEnergy('eos/cms/store/user/khurana/HGCAL/TBNov2016/RECO/analysis/electrons_20_GeV_5_7_X0.root')
-print 'x0=', RadiationLength('eos/cms/store/user/khurana/HGCAL/TBNov2016/RECO/analysis/electrons_20_GeV_5_7_X0.root')
+def RadiationLengthStr(filename):
+    x0 = RadiationLength(filename)
+    x0_ = x0.replace(".","_")
+    x0_ = x0_.replace("_X0_root","")
+    return x0_
+
+
+#print 'energy=', beamEnergy('eos/cms/store/user/khurana/HGCAL/TBNov2016/RECO/analysis/electrons_20_GeV_5_7_X0.root')
+#print 'x0=', RadiationLength('eos/cms/store/user/khurana/HGCAL/TBNov2016/RECO/analysis/electrons_20_GeV_5_7_X0.root')
     

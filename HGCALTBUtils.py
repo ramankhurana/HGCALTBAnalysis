@@ -8,13 +8,15 @@ import numpy as numpy_
 import operator
 from cellInfo import *
 from neighbours import *
+import pythonUtils
 debug_ = False
+
 
 ''' Remove cell numbers where we don't have the timing sensitive detector '''
 def makesensitivelist(fullList):
     toremove = [24, 16, 13, 12, 11, 10, 9, 8, 4, 3, 2, 1, 0]
     for iele in toremove: 
-        fullList = removeElement(fullList,iele)
+        fullList = pythonUtils.removeElement(fullList,iele)
     return fullList
 
 ''' correct the timing of each cell
@@ -75,26 +77,26 @@ def FilterRing(sorted_ring1):
     return filtered_ring1 
 
 
-def LinearEnergyWeightedTime(filtered_ring1):
+def LinearEnergyWeightedTime(filtered_ring1, threshold_=0.0):
     sum1_ = 0.0
     sum2_ = 0.0
     totalT = 0.0
     iampcut = 0.0 
     for icell in range(len(filtered_ring1)):
-        print ('icell amp, time, correctedtime, calibrate, offsetcorrected, timeGaussPeak', filtered_ring1[icell].amplitude_, filtered_ring1[icell].time_, filtered_ring1[icell].time_correct_, filtered_ring1[icell].time_calibrate_, filtered_ring1[icell].time_offsetCorrected_, filtered_ring1[icell].timeGaussPeak  )
+        #print ('icell amp, time, correctedtime, calibrate, offsetcorrected, timeGaussPeak', filtered_ring1[icell].amplitude_, filtered_ring1[icell].time_, filtered_ring1[icell].time_correct_, filtered_ring1[icell].time_calibrate_, filtered_ring1[icell].time_offsetCorrected_, filtered_ring1[icell].timeGaussPeak  )
         iamp = filtered_ring1[icell].amplitude_
         itime = filtered_ring1[icell].time_offsetCorrected_
-        if icell ==0 : iampcut = iamp
-        if icell > 0 : iampcut = 0.75 * filtered_ring1[0].amplitude_
+        #if icell ==0 : iampcut = iamp
+        #if icell > 0 : iampcut = threshold_ * filtered_ring1[0].amplitude_
         
-        if iamp >= 0.999 * iampcut: 
-            product1_ = iamp * (itime)
-            sum1_  =  sum1_ + product1_
-            sum2_ = sum2_ + iamp
+        #if iamp >= 0.99999 * iampcut: 
+        product1_ = iamp * (itime)
+        sum1_  =  sum1_ + product1_
+        sum2_ = sum2_ + iamp
     ## end of for loop
-    if len(filtered_ring1) > 0: totalT =  ( filtered_ring1[0].timeGaussPeak - (sum1_ / sum2_) )
+    if len(filtered_ring1) > 1: totalT =  ( filtered_ring1[0].timeGaussPeak - (sum1_ / sum2_) )
     else:  totalT = -99. 
-    print 'totalT = ', totalT
+    #print 'totalT = ', totalT
     return totalT
 
 

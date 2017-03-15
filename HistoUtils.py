@@ -8,7 +8,7 @@ import numpy as numpy_
 import operator
 from cellInfo import *
 from neighbours import *
-
+import config
 
 def defineHistograms(postfix="_"):
     TDCmap = TH2F('TDCmap'+postfix,'TDCmap'+postfix,40,-20,20, 40,-20,20)
@@ -17,9 +17,21 @@ def defineHistograms(postfix="_"):
     h_TDCxVsTDCy_withoutAmpCut = TH2F('TDCxVsTDCy_withoutAmpCut'+postfix,'TDCxVsTDCy_withoutAmpCut',100,-30,30,100,-30,30)
     allhisto ['TDCmapNoAmpCut'] = h_TDCxVsTDCy_withoutAmpCut
     
-    h_Totaltime = TH1F('h_Totaltime'+postfix,'h_Totaltime', 400, -2, 2)
-    allhisto['Totaltime'] = h_Totaltime
-
+    for iampTh in config.relativeAmpThreshold_:
+        ampThStr = '_AmpTh_'+str(int(iampTh*100))
+        
+        h_Totaltime = TH1F('h_Totaltime'+postfix+ampThStr,'h_Totaltime', 400, -2, 2)
+        allhisto['Totaltime'+ampThStr] = h_Totaltime
+        
+        h_NPads = TH1F('h_NPads'+postfix+ampThStr, 'h_NPads', 20, 1,21)
+        allhisto['h_NPads'+ampThStr] = h_NPads 
+        
+        for ipad in [2,3,4,5,6,7]:
+            ipad_ = str(ipad)
+            h_Totaltime_NPads = TH1F('h_Totaltime'+postfix+ampThStr+ipad_,'h_Totaltime', 400, -2, 2)
+            #print 'Totaltime'+ampThStr+'_'+ipad_
+            allhisto['Totaltime'+ampThStr+'_'+ipad_] = h_Totaltime_NPads
+        
     h_Totaltime_Quad = TH1F('h_Totaltime_Quad'+postfix,'h_Totaltime_Quad', 400, -2, 2.)
     allhisto['Totaltime_Quad'] = h_Totaltime_Quad
 
@@ -81,6 +93,7 @@ def defineHistograms(postfix="_"):
 def WriteHistograms(allhistoFilled_, outputfilename,mode, dirname):
     print allhistoFilled_
     outfile_ = TFile(dirname+'/'+outputfilename,mode)
+    #outfile_ = TFile('/tmp/khurana/'+outputfilename,mode)
     outfile_.cd()
     for k in allhistoFilled_.keys():
         allhistoFilled_[k].Write()

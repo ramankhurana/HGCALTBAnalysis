@@ -21,7 +21,7 @@ from ROOT import TPaveText
 from ROOT import TLatex
 
 import os
-colors=[1,2,4,3,32,20,6,8,20,11,41,46,30,12,28,20,32]
+colors=[5,1,4,3,32,20,6,2,20,11,41,46,30,12,28,20,32]
 markerStyle=[23,21,22,20,24,25,26,27,28,29,20,21,22,23]            
 linestyle=[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
 
@@ -42,7 +42,7 @@ def DrawOverlap(fileVec, histVec, titleVec,legendtext,pngname,logstatus=[0,0],xR
     maximum=[]
     
     ## Legend    
-    leg = TLegend(0.1, 0.70, 0.89, 0.89)#,NULL,"brNDC");
+    leg = TLegend(0.4, 0.70, 0.939, 0.89)#,NULL,"brNDC");
     leg.SetBorderSize(0)
     leg.SetNColumns(2)
     leg.SetLineColor(1)
@@ -103,26 +103,28 @@ def DrawOverlap(fileVec, histVec, titleVec,legendtext,pngname,logstatus=[0,0],xR
 #        print "hist status =", (tt is TH1D) or (tt is TH1F)
         if ih == 0 :      
             if (tt is TGraphAsymmErrors) | (tt is TGraph) : 
-                histList[ih].Draw("AL3")
+                histList[ih].Draw("AL3P")
             if (tt is TH1D) or (tt is TH1F) or (tt is TH1) or (tt is TH1I) :
                 histList[ih].Draw("CHIST")   
         if ih > 0 :
             #histList[ih].SetLineWidth(2)
             if (tt is TGraphAsymmErrors) | (tt is TGraph) : 
-                histList[ih].Draw("L3 same")
+                histList[ih].Draw("L3P same")
             if (tt is TH1D) or (tt is TH1F) or (tt is TH1) or (tt is TH1I) :
                 histList[ih].Draw("CHISTsame")   
 
         if (tt is TGraphAsymmErrors) | (tt is TGraph) :
-            histList[ih].SetMaximum(0.06) 
-            histList[ih].SetMinimum(0.01) 
+           # histList[ih].SetMaximum(0.06) 
+           # histList[ih].SetMinimum(0.02) 
+            histList[ih].SetMaximum(10.2) 
+            histList[ih].SetMinimum(10.1) 
             histList[ih].SetMarkerColor(colors[ih])
             histList[ih].SetLineColor(colors[ih])
             histList[ih].SetLineWidth(3)
             histList[ih].SetLineStyle(linestyle[ih])
             
-            #histList[ih].SetMarkerStyle(markerStyle[ih])
-            #histList[ih].SetMarkerSize(1)
+            histList[ih].SetMarkerStyle(markerStyle[ih])
+            histList[ih].SetMarkerSize(1)
             leg.AddEntry(histList[ih],legendtext[ih],"PL")
         if (tt is TH1D) or (tt is TH1F) or (tt is TH1) or (tt is TH1I) :
             histList[ih].SetLineStyle(linestyle[ih])
@@ -130,11 +132,11 @@ def DrawOverlap(fileVec, histVec, titleVec,legendtext,pngname,logstatus=[0,0],xR
             histList[ih].SetLineWidth(3)
             leg.AddEntry(histList[ih],legendtext[ih],"L")
         histList[ih].GetYaxis().SetTitle(titleVec[1])
-        histList[ih].GetYaxis().SetTitleSize(0.052)
+        histList[ih].GetYaxis().SetTitleSize(0.045)
         histList[ih].GetYaxis().SetTitleOffset(1.1000998)
         histList[ih].GetYaxis().SetTitleFont(22)
         histList[ih].GetYaxis().SetLabelFont(22)
-        histList[ih].GetYaxis().SetLabelSize(.052)
+        histList[ih].GetYaxis().SetLabelSize(.045)
         histList[ih].GetXaxis().SetRangeUser(xRange[0],xRange[1])
         histList[ih].GetXaxis().SetLabelSize(0.0000);
         histList[ih].GetXaxis().SetTitle(titleVec[0])
@@ -179,8 +181,8 @@ def DrawOverlap(fileVec, histVec, titleVec,legendtext,pngname,logstatus=[0,0],xR
     histname=outputdirname+pngname 
     c.SaveAs(histname+'.png')
     c.SaveAs(histname+'.pdf')
-    outputname = 'cp  -r '+ outputdirname +' /afs/hep.wisc.edu/home/khurana/public_html/'
-    os.system(outputname) 
+#    outputname = 'cp  -r '+ outputdirname +' /afs/hep.wisc.edu/home/khurana/public_html/'
+#    os.system(outputname) 
 
 
 
@@ -193,8 +195,47 @@ legend=['50',
         '150',
         '200', 
         '250' ]
-DrawOverlap(files,['Graph'],["cell number","Time resolution"],legend,'limit_Comparison',[0,0],)
+#DrawOverlap(files,['resolution_correctedVsCell_Amp_0'],["cell number","Time resolution"],legend,'resolution_correctedVsCell_Amp_0',[0,0],)
+#DrawOverlap(files,['resolution_correctedVsCell_Amp_1'],["cell number","Time resolution"],legend,'resolution_correctedVsCell_Amp_1',[0,0],)
+#DrawOverlap(files,['resolution_correctedVsCell_Amp_2'],["cell number","Time resolution"],legend,'resolution_correctedVsCell_Amp_2',[0,0],)
+#DrawOverlap(files,['resolution_correctedVsCell_Amp_3'],["cell number","Time resolution"],legend,'resolution_correctedVsCell_Amp_3',[0,0],)
+#DrawOverlap(files,['resolution_correctedVsCell_Amp_4'],["cell number","Time resolution"],legend,'resolution_correctedVsCell_Amp_4',[0,0],)
 
-files=['    
+legend1=['17','18','19','20','21','22','23'] 
+#graphname = ['MeanValue_17','MeanValue_18','MeanValue_19','MeanValue_20','MeanValue_21','MeanValue_22','MeanValue_23']
+#DrawOverlap(['histogramsRootFile/ExtractOffsetGraphs_50.root'],graphname,["Amplitude","Offset"],legend1,'ExtractOffsetGraphs_50',[0,0],)
+#DrawOverlap(['histogramsRootFile/ExtractOffsetGraphs_100.root'],graphname,["Amplitude","Offset"],legend1,'ExtractOffsetGraphs_100',[0,0],)
+#DrawOverlap(['histogramsRootFile/ExtractOffsetGraphs_150.root'],graphname,["Amplitude","Offset"],legend1,'ExtractOffsetGraphs_150',[0,0],)
+#DrawOverlap(['histogramsRootFile/ExtractOffsetGraphs_200.root'],graphname,["Amplitude","Offset"],legend1,'ExtractOffsetGraphs_200',[0,0],)
+#DrawOverlap(['histogramsRootFile/ExtractOffsetGraphs_250.root'],graphname,["Amplitude","Offset"],legend1,'ExtractOffsetGraphs_250',[0,0],)
 
-    
+#####################file name ###########################
+filesname_1 = ['histogramsRootFile/ExtractOffsetGraphs_32.root','histogramsRootFile/ExtractOffsetGraphs_50.root','histogramsRootFile/ExtractOffsetGraphs_100.root','histogramsRootFile/ExtractOffsetGraphs_150.root','histogramsRootFile/ExtractOffsetGraphs_200.root','histogramsRootFile/ExtractOffsetGraphs_250.root']
+legend_1 = ['32','50','100','150','200','250']
+DrawOverlap(filesname_1,['MeanValue_17'],["Amplitude","Offset"],legend_1,'ExtractOffsetGraphs_17',[0,0],) 
+DrawOverlap(filesname_1,['MeanValue_18'],["Amplitude","Offset"],legend_1,'ExtractOffsetGraphs_18',[0,0],) 
+DrawOverlap(filesname_1,['MeanValue_19'],["Amplitude","Offset"],legend_1,'ExtractOffsetGraphs_19',[0,0],) 
+DrawOverlap(filesname_1,['MeanValue_20'],["Amplitude","Offset"],legend_1,'ExtractOffsetGraphs_20',[0,0],) 
+DrawOverlap(filesname_1,['MeanValue_21'],["Amplitude","Offset"],legend_1,'ExtractOffsetGraphs_21',[0,0],) 
+DrawOverlap(filesname_1,['MeanValue_22'],["Amplitude","Offset"],legend_1,'ExtractOffsetGraphs_22',[0,0],) 
+DrawOverlap(filesname_1,['MeanValue_23'],["Amplitude","Offset"],legend_1,'ExtractOffsetGraphs_23',[0,0],) 
+
+#############Plot type ###############
+
+#legend2=['17','18','19','20','21','22','23','Combo'] 
+#plotname =['Resolution_cell_17_amp_0','Resolution_cell_18_amp_0','Resolution_cell_19_amp_0','Resolution_cell_20_amp_0','Resolution_cell_21_amp_0','Resolution_cell_22_amp_0','Resolution_cell_23_amp_0','Resolution_cell_100_amp_0']
+#plotname1 =['Resolution_cell_17_amp_1','Resolution_cell_18_amp_1','Resolution_cell_19_amp_1','Resolution_cell_20_amp_1','Resolution_cell_21_amp_1','Resolution_cell_22_amp_1','Resolution_cell_23_amp_1','Resolution_cell_100_amp_1']
+#plotname2 =['Resolution_cell_17_amp_2','Resolution_cell_18_amp_2','Resolution_cell_19_amp_2','Resolution_cell_20_amp_2','Resolution_cell_21_amp_2','Resolution_cell_22_amp_2','Resolution_cell_23_amp_2','Resolution_cell_100_amp_2']
+#plotname3 =['Resolution_cell_17_amp_3','Resolution_cell_18_amp_3','Resolution_cell_19_amp_3','Resolution_cell_20_amp_3','Resolution_cell_21_amp_3','Resolution_cell_22_amp_3','Resolution_cell_23_amp_3','Resolution_cell_100_amp_3']
+#plotname4 =['Resolution_cell_17_amp_4','Resolution_cell_18_amp_4','Resolution_cell_19_amp_4','Resolution_cell_20_amp_4','Resolution_cell_21_amp_4','Resolution_cell_22_amp_4','Resolution_cell_23_amp_4','Resolution_cell_100_amp_4']
+
+
+#DrawOverlap(['OutputrootFileResolution_withamplitude.root'],plotname,["E_{beam}[GeV]","Resolution"],legend2,'ResolutionVsenergy_amp0',[0,0],)
+#DrawOverlap(['OutputrootFileResolution_withamplitude.root'],plotname1,["E_{beam}[GeV]","Resolution"],legend2,'ResolutionVsenergy_amp1',[0,0],)
+#DrawOverlap(['OutputrootFileResolution_withamplitude.root'],plotname2,["E_{beam}[GeV]","Resolution"],legend2,'ResolutionVsenergy_amp2',[0,0],)
+#DrawOverlap(['OutputrootFileResolution_withamplitude.root'],plotname3,["E_{beam}[GeV]","Resolution"],legend2,'ResolutionVsenergy_amp3',[0,0],)
+#DrawOverlap(['OutputrootFileResolution_withamplitude.root'],plotname4,["E_{beam}[GeV]","Resolution"],legend2,'ResolutionVsenergy_amp4',[0,0],)
+
+#plotname5 =['Resolution_cell_17_amp_1','Resolution_cell_18_amp_1','Resolution_cell_19_amp_1','Resolution_cell_20_amp_1','Resolution_cell_21_amp_1','Resolution_cell_22_amp_1','Resolution_cell_23_amp_1']
+#legend3=['17','18','19','20','21','22','23']
+#DrawOverlap(['OutputrootFileResolution_withamplitude.root'],plotname5,["E_{beam}[GeV]","Resolution"],legend3,'ResolutionVsenergy_amp1_withoutcombo',[0,0],)

@@ -6,8 +6,18 @@ eosmount eos1
 ## To save histogram for extracthing the offsets for each cell and each amplitude cut use: 
 python HGCALTBAnalyzer.py -e 
 
+## To extract the numbers and rootfiles with timewalk and offset information you can run the code:
+root -l -b -q Time_walk_extracter.C
+## This will write .root files in the "histogramsRootFile" directory and text file for durther usage in "data" directory
+
 ## The text file and rootfiles with graphs can be saved using: 
 python ExtractOffSetFactors.py
+
+Overlapping plot for one particular energy file can be made using: 
+python 
+
+and then 
+python 
 
 ## Once all the offsets are extracted we can now apply them on each cell and each energy and each amplitude cut. 
 
@@ -16,6 +26,7 @@ python HGCALTBAnalyzer.py -a
 
 ## This will loop over the files in a directory and run on each of the files in this directory. You have to give file path in the "inputrootfiles.txt" 
 
+
 ## You can use the output to get the offset factors for each cell. This is done using just one single histogram (TH3D) with X axis: amplitude, Y axis: time, Z axis: cell number 
 
 ## 
@@ -23,3 +34,17 @@ python HGCALTBAnalyzer.py -a
 
 
 ## You can run the following command to save all the fit plots in a directory for each energy point and some more plots which are used to interpret the results. 
+
+
+-------------- This can be used for one radiation length point-----------------
+## For summary of resolution plot. 
+root -l -b -q FitCode.C 
+## this will give "Resolution_TimeCorrected_GeV_5_7_X0.txt" which has information for all the cells
+and 
+root -l -b -q Fitting_CombineRes.C 
+## this will give CombineResolution_DifferentAmplitude_GeV_5_7_X0.txt which has information for resolution with various combination configurations 
+python ReadFileForCombinationand.py 
+## which make all the TGraphs Energy vs Resoltion for all the graphs. 
+python Overlapping_CombineResAnd.py
+## which will make the final result plot. 
+

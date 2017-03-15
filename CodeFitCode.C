@@ -2,12 +2,12 @@ void SaveGraphs(  TString energy = "250"){
 
   
 
-  TString filename = "histogramsRootFile/electrons_"+energy+"_GeV_5_7_X0.root";
+  TString filename = "histogramsOffSetExtraction/electrons_"+energy+"_GeV_5_7_X0.root";
   cout << filename <<std::endl;
   TString dirname = "histogramsPDF/DirResolutionPerCell_"+energy;
   gSystem->Exec("mkdir "+dirname);
   
-  TString fileout = "histogramsRootFile/Output_"+energy+".root";
+  TString fileout = "histogramsRootFile/ExtractOffsetGraphs_"+energy+".root";
   TFile *fout = new TFile(fileout,"recreate");
   TFile *f1 = new TFile(filename,"open");
   f1->cd();
@@ -67,6 +67,7 @@ void SaveGraphs(  TString energy = "250"){
     TGraph* gr = new TGraph(5,cell,width);
     c1->cd();
     gr->Draw("AC*");
+    gr->SetNameTitle("Resolution_"+cellnumber,"Resolution_"+cellnumber);
     gr->GetXaxis()->SetTitle("Cell ");
     gr->GetYaxis()->SetTitle("Resolution");
     
@@ -77,6 +78,7 @@ void SaveGraphs(  TString energy = "250"){
     TGraph* grmean = new TGraph(5,cell,mean);
     c1->cd();
     grmean->Draw("AC*");
+    grmean->SetNameTitle("MeanValue_"+cellnumber,"MeanValue_"+cellnumber);
     grmean->GetXaxis()->SetTitle("Cell ");
     grmean->GetYaxis()->SetTitle("Mean");
     

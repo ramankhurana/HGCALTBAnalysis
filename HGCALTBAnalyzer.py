@@ -1,11 +1,5 @@
 #!/usr/bin/env python                                                                                                                                                               
-#### 
-## Changes 
-# - interchange TDCX and TDCy
-# - add calibration 
-# - add histo for lineartime45 - lineartime45[16]
-# - add histo for linear 60 - gauspeak [16] 
-##  
+
 from ROOT import TFile, TTree, TH1F, TH1D, TH1, TCanvas, TChain,TGraphAsymmErrors, TMath, TH2D, TLorentzVector, AddressOf, gROOT, TH2F
 import ROOT as ROOT
 import os
@@ -17,16 +11,27 @@ import operator
 
 ##
 ## User code 
-##
+## 
+'''
+
+ import classname should be used and later in the code use: classname.classfunction
+ instead of 
+ from classname import *
+ this will help in keeping track which functions are in which class. 
+ otherwise it would not be tracable. 
+
+'''
+
 from cellInfo import *
 from neighbours import *
-from HGCALTBUtils import *  ## HGCAL related functions 
+import HGCALTBUtils  ## HGCAL related functions 
 from Utils import * ## ROOT related utinities 
 from pythonUtils import * ## python related utilities 
 from HistoUtils import * ## Histogram related utilities 
-from calibrationReader import * 
+import calibrationReader
 
-
+import pythonUtils
+import config
 usage = "usage: %prog [options] arg1 arg2"
 parser = optparse.OptionParser(usage)
 
@@ -37,6 +42,7 @@ parser.add_option("-o", "--inputOffsetfile", dest="inputOffsetfile")
 
 parser.add_option("-e", "--extractOffsetMode", action="store_true",  dest="extractOffsetMode")
 parser.add_option("-a", "--applyOffsetMode",   action="store_true",  dest="applyOffsetMode")
+parser.add_option("-A", "--applyOffsetModeNoAmplitudeCut",   action="store_true",  dest="applyOffsetModeNoAmplitudeCut")
 
 (options, args) = parser.parse_args()
 
@@ -68,7 +74,22 @@ calibration={'17':10.12,
              '23':10.18}
 
 
-amplitudeCut=[0.05, 0.1, 0.15, 0.2, 0.25]
+amplitudeBins=[]
+amplitudeCut=[]
+
+if options.applyOffsetModeNoAmplitudeCut:
+    amplitudeBins=[[0.0, 0.48]]
+    amplitudeCut=[]
+
+#amplitudeCut=[0.00, 0.05, 0.1, 0.15, 0.2, 0.25]
+if options.applyOffsetMode:
+    amplitudeBins=[[0.00,0.02], [0.02,0.04], [0.04, 0.06], [0.06, 0.08], [0.08, 0.1], [0.1, 0.12], [0.12, 0.14], [0.14, 0.16], [0.16, 0.18], [0.18, 0.20], [0.20, 0.25], [0.25, 0.30], [0.30, 0.35], [0.35, 0.40], [0.40, 0.48]]
+    amplitudeCut=[0.01, 0.03, 0.05, 0.07, 0.09, 0.11, 0.13, 0.15, 0.17, 0.19, 0.225, 0.275, 0.325, 0.375, 0.44]
+
+#amplitudeBins=[[0.00,0.02], [0.02,0.04], [0.04, 0.06], [0.06, 0.08], [0.08, 0.1], [0.1, 0.12], [0.12, 0.14], [0.14, 0.16], [0.16, 0.18], [0.18, 0.20], [0.20, 0.25], [0.25, 0.30], [0.30, 0.35], [0.35, 0.40], [0.40, 0.48]]
+#amplitudeCut=[0.01, 0.03, 0.05, 0.07, 0.09, 0.11, 0.13, 0.15, 0.17, 0.19, 0.225, 0.275, 0.325, 0.375, 0.44]
+print ('size  ',len(amplitudeBins), len(amplitudeCut))
+
 ##
 ## Analyse function: This will call all other functions needed and manage them. 
 ##   
@@ -120,7 +141,7 @@ def analyze(timingTree, allhisto_, ampCutIndex, calib):
         
         allhisto_['TDCmapNoAmpCut'].Fill(tt_TDCx,tt_TDCy)
 
-        tt_linearTime45_corrected = CorrectTiming(list(tt_linearTime45), list(tt_gauspeak))
+        tt_linearTime45_corrected = HGCALTBUtils.CorrectTiming(list(tt_linearTime45), list(tt_gauspeak))
                 
         
                 
@@ -133,14 +154,14 @@ def analyze(timingTree, allhisto_, ampCutIndex, calib):
         info_ring1 = []
         for icell in range(17,24):
             cellnumber = str(icell)
-            if ( (abs(tt_TDCx)<30.) & (abs(tt_TDCy)<30.) & (tt_amp[icell] > amplitudeCut[ampCutIndex]) & (tt_amp[icell] <0.48) ):
+            if ( (abs(tt_TDCx)<30.) & (abs(tt_TDCy)<30.) & (tt_amp[icell] > amplitudeBins[ampCutIndex][0]) & (tt_amp[icell] < amplitudeBins[ampCutIndex][1]) ):
                 allhisto_['TDCmapWithAmpCut_'+cellnumber].Fill(tt_TDCx,tt_TDCy)
                 
                 time_ = tt_linearTime45_corrected[icell] 
                 
                 #print ('-------------------------------',cellnumber, str(amplitudeCut[ampCutIndex]))
                 if debug_: print ('-------------------------------',cellnumber, ampCutIndex)
-                offsetList    = (calib.CalibationFactor(cellnumber, str(amplitudeCut[ampCutIndex]) ))
+                offsetList    = (calib.CalibationFactor(cellnumber, tt_amp[icell]) )
                 if debug_: print "offset list", offsetList
                 
                 ## correct for offset 
@@ -154,8 +175,6 @@ def analyze(timingTree, allhisto_, ampCutIndex, calib):
                 allhisto_['timecorrected_'+cellnumber].Fill(time_calibrated)
                 
                 allhisto_['timeOffsetcorrected_'+cellnumber].Fill(tt_linearTime45[icell] + float(offsetList[0]))
-                
-                
                 
                 ## 2D histograms 
                 allhisto_['h2_TDCy_vs_amp_'+cellnumber].Fill(tt_TDCy, tt_amp[icell])
@@ -198,23 +217,44 @@ def analyze(timingTree, allhisto_, ampCutIndex, calib):
         ##print 'size of list before cleaning is ', len(sorted_ring1)
         
         ## set the flags about the neighbours for each cell in the event 
-        sorted_ring1 = SetNeighbourFlag(sorted_ring1)
+        sorted_ring1 = HGCALTBUtils.SetNeighbourFlag(sorted_ring1)
         
         ## remove the cells which are not neighbour 
-        filtered_ring1 = FilterRing(sorted_ring1)
+        filtered_ring1 = HGCALTBUtils.FilterRing(sorted_ring1)
         
         ##print 'size of list after cleaning is ', len(filtered_ring1)
         
         ## calculate linear energy weighted time 
-        totalT = LinearEnergyWeightedTime(filtered_ring1)
-        if (len(filtered_ring1)>1): allhisto_['Totaltime'].Fill(totalT)
+        for iampthreshold_ in config.relativeAmpThreshold_:
+            if (len(filtered_ring1)>1): 
+                #print ('iampthreshold_, totalT', iampthreshold_, totalT)
+                ampThStr = '_AmpTh_'+str(int(iampthreshold_*100))
+                
+                filtered_ring1_AmpTh = []
+                for cells in range(len(filtered_ring1)):
+                    if cells == 0: 
+                        filtered_ring1_AmpTh.append(filtered_ring1[0])
+                        continue 
+                    ampth = iampthreshold_ * filtered_ring1[0].amplitude_ 
+                    if filtered_ring1[cells].amplitude_ > ampth:
+                        filtered_ring1_AmpTh.append(filtered_ring1[cells])
+                        
+                allhisto_['h_NPads'+ampThStr].Fill(len(filtered_ring1_AmpTh))
+                totalT = HGCALTBUtils.LinearEnergyWeightedTime(filtered_ring1_AmpTh)
+                if totalT != -99.0:  
+                    allhisto_['Totaltime'+ampThStr].Fill(totalT)
+                    
+                    ipad_ = str(int(len(filtered_ring1_AmpTh)))
+                    allhisto_['Totaltime'+ampThStr+'_'+ipad_].Fill(totalT)
 
+
+                print ("event #", ievent, "amp cut =", iampthreshold_, "len = ", len(filtered_ring1_AmpTh), "time =", totalT)
         ## calculate the quadrature weighted time 
-        totalT = QuadratureEnergyWeightedTime(filtered_ring1)
+        totalT = HGCALTBUtils.QuadratureEnergyWeightedTime(filtered_ring1)
         if (len(filtered_ring1)>1): allhisto_['Totaltime_Quad'].Fill(totalT)
 
         ## calculate the log energy weighted time 
-        totalT = LogEnergyWeightedTime(filtered_ring1)
+        totalT = HGCALTBUtils.LogEnergyWeightedTime(filtered_ring1)
         if (len(filtered_ring1)>1): allhisto_['Totaltime_Log'].Fill(totalT)
 
         
@@ -232,10 +272,10 @@ if __name__ == "__main__":
     ## make one rootfile for each input file. 
     ## TChain should be inside loop becuase sequence has to run on each rootfile and give one output rootfile instead of one big rootfile. 
     for ifile in infile:
-        E  = beamEnergy(ifile)
-        x0 = RadiationLength(ifile)
-        calibrationtextfile = 'data/Resolution_'+E+'.txt'
-        calib = calibrationReader(calibrationtextfile)
+        E  = pythonUtils.beamEnergy(ifile)
+        x0 = pythonUtils.RadiationLengthStr(ifile)
+        calibrationtextfile = 'data/offset_and_timewalk_E_'+E+'_GeV_'+x0+'_X0.txt' #Resolution_'+E+'.txt'
+        calib = calibrationReader.calibrationReader(calibrationtextfile)
                 
         timingTree_ = TChain(treeName)
         timingTree_.Add(ifile.rstrip())
@@ -253,8 +293,13 @@ if __name__ == "__main__":
                 allhisto_  = defineHistograms('_Amp_'+str(iamp))
                 allhistoFilled_  = analyze(timingTree_, allhisto_,iamp, calib)
                 if iamp==0:
-                    WriteHistograms(allhistoFilled_, outputfilename,"RECREATE","histogramsRootFile")
+                    WriteHistograms(allhistoFilled_, outputfilename,"RECREATE","histogramsRootFile_1")
                 else:
-                    WriteHistograms(allhistoFilled_, outputfilename,"UPDATE","histogramsRootFile")
+                    WriteHistograms(allhistoFilled_, outputfilename,"UPDATE","histogramsRootFile_1")
 
+        if options.applyOffsetModeNoAmplitudeCut: 
+            allhisto_  = defineHistograms('_Amp_0')
+            allhistoFilled_  = analyze(timingTree_, allhisto_,0, calib)
+            WriteHistograms(allhistoFilled_, outputfilename,"RECREATE","histogramsRootFile_1")
+            
 
