@@ -1,0 +1,113 @@
+void SaveGraphs(  TString energy = "250"){
+
+  
+
+  TString filename = "histogramsRootFile/electrons_"+energy+"_GeV_5_7_X0.root";
+  cout << filename <<std::endl;
+  TString dirname = "DirResolutionPerCell_"+energy;
+  gSystem->Exec("mkdir "+dirname);
+  
+  TString fileout = "Output_XScan_"+energy+".root";
+  TFile *fout = new TFile(fileout,"recreate");
+  TFile *f1 = new TFile(filename,"open");
+  f1->cd();
+  TString cellnumber,cellnumber__, histoname;
+  TString nameofhisto,histo2D;
+  double range_min, range_max,x;
+  int binmax;
+  double par[3];
+
+  double width_corr[7], cell_corr[7];
+  TCanvas *c1 = new TCanvas ("c1","c1", 700, 500);
+  TF1 *fgaus;
+
+  TH2F *h4;
+  TH1D *projectionh;
+  //TDCx Vs time
+
+  const int RCell = 17;
+  double width[RCell], cell[RCell];
+  int j ;
+  int startbin, endbin divison;
+  for(int cellN = 17; cellN <=17; cellN++){
+    cellnumber.Form("%d",cellN);
+    histo2D = "h2_TDCy_vs_time_"+ cellnumber+"_Amp_1";
+    cout << histo2D <<std::endl;
+    h4 = (TH2F*) f1->Get(histo2D);
+    //startbin = h4->GetXaxis()->FindBin(-10.0);
+    //endbin = h4->GetXaxis()->FindBin(15.5);
+    
+    // following is only for cell 17
+    startbin = h4->GetXaxis()->FindBin(4.0);
+    endbin = h4->GetXaxis()->FindBin(14.0);
+    divison =(double) (endbin - startbin)/RCell;
+    j =0 ;
+    for (int i = startbin ; i <= endbin; i = i + divison ){
+      int rangefor = i+divison-1;
+      projectionh = h4->ProjectionY("projectionh ",i,rangefor);
+      binmax =projectionh->GetMaximumBin();
+      
+      x =projectionh->GetXaxis()->GetBinCenter(binmax);  
+      range_min = x - (1.5 * projectionh->GetRMS());
+      range_max = x + (1.5 * projectionh->GetRMS());
+      fgaus = new TF1("fgaus","gaus",range_min,range_max);
+      projectionh->GetXaxis()->SetRangeUser(x-0.2,x+0.2);
+      projectionh->Fit("fgaus","R");
+      fgaus->GetParameters(&par[0]);
+      width[j] = par[2];
+      cell[j]= j;
+      //      cout << cell[j]  <<"   " <<width[j] <<std::endl;
+      j++;
+      c1->cd();
+      gStyle->SetOptFit(1111111); 
+      projectionh->Draw();
+      cellnumber__.Form("%d",i);
+      nameofhisto = histo2D+"_"+cellnumber__;
+      c1->SaveAs(dirname+"/"+nameofhisto+".png");
+      }
+    
+    //  int n = 17;
+    TGraph* gr = new TGraph(17,cell,width);
+    c1->cd();
+    gr->Draw("AC*");
+    gr->GetXaxis()->SetTitle("Cell ");
+    gr->GetYaxis()->SetTitle("Resolution");
+    gr->SetNameTitle("/Xscan_"+cellnumber,"/Xscan_"+cellnumber);
+    c1->SaveAs(dirname+"/Xscan_"+cellnumber+".png");
+    fout->cd();  
+    gr->Write();  
+  }
+    
+  /*  
+  ofstream ftext;
+  ftext.open("PileUpWeights.txt");
+  ftext << "Energy :" << energy <<std::endl;
+  for (int i=0; i<=6; i++){
+    ftext<<    cell_corr[i]  << " " << energy <<" "<<width_corr[i]<<std::endl;
+  }
+
+  */
+
+  //return width_corr;
+}
+
+void MoreStudy_FitCode(){
+  std::vector<TString> energyList;
+  energyList.clear();
+  //energyList.push_back("20");
+  //energyList.push_back("32");
+  //  energyList.push_back("50");
+  //energyList.push_back("100");
+  // energyList.push_back("150");
+  //energyList.push_back("200");
+  energyList.push_back("250");
+  //float* resol;
+
+  for (int ie = 0; ie < (int) energyList.size(); ie++){
+    TString energy_ = energyList[ie];
+    SaveGraphs(energy_);
+    //resol = SaveGraphs(energy_);
+  }
+  
+  //std::cout<<" resol = "<<resol[0]<<" "<<resol[1]<<" "<<resol[2]<<std::endl;
+}

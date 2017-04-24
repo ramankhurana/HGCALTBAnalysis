@@ -77,7 +77,7 @@ def FilterRing(sorted_ring1):
     return filtered_ring1 
 
 
-def LinearEnergyWeightedTime(filtered_ring1, threshold_=0.0):
+def LinearEnergyWeightedTime(filtered_ring1, threshold_=0.05):
     sum1_ = 0.0
     sum2_ = 0.0
     totalT = 0.0
@@ -86,13 +86,15 @@ def LinearEnergyWeightedTime(filtered_ring1, threshold_=0.0):
         #print ('icell amp, time, correctedtime, calibrate, offsetcorrected, timeGaussPeak', filtered_ring1[icell].amplitude_, filtered_ring1[icell].time_, filtered_ring1[icell].time_correct_, filtered_ring1[icell].time_calibrate_, filtered_ring1[icell].time_offsetCorrected_, filtered_ring1[icell].timeGaussPeak  )
         iamp = filtered_ring1[icell].amplitude_
         itime = filtered_ring1[icell].time_offsetCorrected_
-        #if icell ==0 : iampcut = iamp
-        #if icell > 0 : iampcut = threshold_ * filtered_ring1[0].amplitude_
+        if icell ==0 : iampcut = iamp
+        if icell > 0 : iampcut = threshold_ * filtered_ring1[0].amplitude_
         
-        #if iamp >= 0.99999 * iampcut: 
-        product1_ = iamp * (itime)
-        sum1_  =  sum1_ + product1_
-        sum2_ = sum2_ + iamp
+        if iamp >= 0.99999 * iampcut: 
+        
+            product1_ = iamp * (itime)
+            sum1_  =  sum1_ + product1_
+            sum2_ = sum2_ + iamp
+            
     ## end of for loop
     if len(filtered_ring1) > 1: totalT =  ( filtered_ring1[0].timeGaussPeak - (sum1_ / sum2_) )
     else:  totalT = -99. 

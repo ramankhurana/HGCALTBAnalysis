@@ -43,6 +43,8 @@ def DrawOverlap(fileVec, histVec, titleVec,legendtext,pngname,logstatus=[0,0],xR
     
     ## Legend    
     leg = TLegend(0.4, 0.70, 0.939, 0.89)#,NULL,"brNDC");
+    legendtitle = legendtext[-1]
+    leg.SetHeader(legendtitle)
     leg.SetBorderSize(0)
     leg.SetNColumns(2)
     leg.SetLineColor(1)
@@ -192,23 +194,52 @@ def DrawOverlap(fileVec, histVec, titleVec,legendtext,pngname,logstatus=[0,0],xR
 
 print "calling the plotter"
 
-files = ['ResPlot_new_GeV_5_7_X0.root']
-plotname= ['EnergyVsWidth_cell_17','EnergyVsWidth_cell_18','EnergyVsWidth_cell_19','EnergyVsWidth_cell_20','EnergyVsWidth_cell_21','EnergyVsWidth_cell_22','EnergyVsWidth_cell_23','EnergyVsWidth_amp_0','EnergyVsWidth_amp_5']
-legend=['17','18','19','20','21','22','23','combo_1','combo_2']
-DrawOverlap(files,plotname,["Energy","Resolution"],legend,'EnergyVsWidth_cell_Combine_GeV_5_7_X0',[0,0],) 
+radiationlength = ['5_7', '10']
 
-files1 = ['ResPlot_new_GeV_5_7_X0.root']
-plotname1= ['EnergyVsWidth_amp_0','EnergyVsWidth_amp_5','EnergyVsWidth_amp_15','EnergyVsWidth_amp_25','EnergyVsWidth_amp_70']
-legend=['0','5','15','25','70']
-DrawOverlap(files1,plotname1,["Energy","Resolution"],legend,'EnergyVsWidth_Combine_ForVariousAmplCut_GeV_5_7_X0',[0,0],) 
+for rl in radiationlength: 
+    print rl
+    files1 = ['ResPlot_new_GeV_'+rl+'_X0.root']
+    plotname= ['EnergyVsWidth_cell_17','EnergyVsWidth_cell_18','EnergyVsWidth_cell_19','EnergyVsWidth_cell_20','EnergyVsWidth_cell_21','EnergyVsWidth_cell_22','EnergyVsWidth_cell_23','EnergyVsWidth_amp_0_1','EnergyVsWidth_amp_5_1']
+    legend=['17','18','19','20','21','22','23','combo_1','combo_2', 'comparison']
+    DrawOverlap(files1,plotname,["Energy","Resolution"],legend,'EnergyVsWidth_cell_Combine_GeV_'+rl+'_X0',[0,0],) 
+    
+    #files1 = ['ResPlot_new_GeV_'+rl+'_X0.root']
+    plotname1= ['EnergyVsWidth_amp_0_1','EnergyVsWidth_amp_5_1','EnergyVsWidth_amp_15_1','EnergyVsWidth_amp_25_1','EnergyVsWidth_amp_70_1']
+    legend=['0','5','15','25','70', 'amp. th.']
+    DrawOverlap(files1,plotname1,["Energy","Resolution"],legend,'EnergyVsWidth_Combine_ForVariousAmplCut_GeV_'+rl+'_X0',[0,0],) 
+    
+    
+    plotname1= ['EnergyVsWidth_amp_0_2','EnergyVsWidth_amp_0_3','EnergyVsWidth_amp_0_4','EnergyVsWidth_amp_0_5','EnergyVsWidth_amp_0_6','EnergyVsWidth_amp_0_7']
+    legend=['2','3','4','5','6','7','ncells']
+    DrawOverlap(files1,plotname1,["Energy","Resolution"],legend,'EnergyVsWidth_Combine_GeV_'+rl+'_X0_ncellscom_amplcut_0_',[0,0],) 
+    
+    plotname1= ['EnergyVsWidth_amp_5_2','EnergyVsWidth_amp_5_3','EnergyVsWidth_amp_5_4','EnergyVsWidth_amp_5_5','EnergyVsWidth_amp_5_6','EnergyVsWidth_amp_5_7']
+    legend=['2','3','4','5','6','7','ncells']
+    DrawOverlap(files1,plotname1,["Energy","Resolution"],legend,'EnergyVsWidth_Combine_GeV_'+rl+'_X0_ncellscom_amplcut_5_',[0,0],) 
+    
+    plotname1= ['EnergyVsWidth_amp_15_2','EnergyVsWidth_amp_15_3','EnergyVsWidth_amp_15_4','EnergyVsWidth_amp_15_5','EnergyVsWidth_amp_15_6','EnergyVsWidth_amp_15_7']
+    legend=['2','3','4','5','6','7','ncells']
+    DrawOverlap(files1,plotname1,["Energy","Resolution"],legend,'EnergyVsWidth_Combine_GeV_'+rl+'_X0_ncellscom_amplcut_15_',[0,0],) 
+    
+    plotname1= ['EnergyVsWidth_amp_25_2','EnergyVsWidth_amp_25_3','EnergyVsWidth_amp_25_4','EnergyVsWidth_amp_25_5','EnergyVsWidth_amp_25_6','EnergyVsWidth_amp_25_7']
+    legend=['2','3','4','5','6','7','ncells']
+    DrawOverlap(files1,plotname1,["Energy","Resolution"],legend,'EnergyVsWidth_Combine_GeV_'+rl+'_X0_ncellscom_amplcut_25_',[0,0],) 
+    
+    
+    plotname1= ['EnergyVsWidth_amp_5_2','EnergyVsWidth_amp_5_3','EnergyVsWidth_amp_70_4','EnergyVsWidth_amp_70_5','EnergyVsWidth_amp_70_6','EnergyVsWidth_amp_70_7']
+    legend=['2','3','4','5','6','7','ncells']
+    DrawOverlap(files1,plotname1,["Energy","Resolution"],legend,'EnergyVsWidth_Combine_GeV_'+rl+'_X0_ncellscom_amplcut_70_',[0,0],) 
+    
 
 
+'''
 files = ['ResPlot_new_GeV_10_X0.root']
-plotname= ['EnergyVsWidth_cell_17','EnergyVsWidth_cell_18','EnergyVsWidth_cell_19','EnergyVsWidth_cell_20','EnergyVsWidth_cell_21','EnergyVsWidth_cell_22','EnergyVsWidth_cell_23','EnergyVsWidth_amp_0','EnergyVsWidth_amp_5']
+plotname= ['EnergyVsWidth_cell_17','EnergyVsWidth_cell_18','EnergyVsWidth_cell_19','EnergyVsWidth_cell_20','EnergyVsWidth_cell_21','EnergyVsWidth_cell_22','EnergyVsWidth_cell_23','EnergyVsWidth_amp_70_1','EnergyVsWidth_amp_5_1']
 legend=['17','18','19','20','21','22','23','combo_1','combo_2']
 DrawOverlap(files,plotname,["Energy","Resolution"],legend,'EnergyVsWidth_cell_Combine_GeV_10_X0',[0,0],) 
 
 files1 = ['ResPlot_new_GeV_10_X0.root']
-plotname1= ['EnergyVsWidth_amp_0','EnergyVsWidth_amp_5','EnergyVsWidth_amp_15','EnergyVsWidth_amp_25','EnergyVsWidth_amp_70']
+plotname1= ['EnergyVsWidth_amp_0_1','EnergyVsWidth_amp_5_1','EnergyVsWidth_amp_15_1','EnergyVsWidth_amp_25_1','EnergyVsWidth_amp_70_1']
 legend=['0','5','15','25','70']
 DrawOverlap(files1,plotname1,["Energy","Resolution"],legend,'EnergyVsWidth_Combine_ForVariousAmplCut_GeV_10_X0',[0,0],) 
+'''

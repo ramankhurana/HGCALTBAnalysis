@@ -1,0 +1,14 @@
+('amp,              time,             correctedtime,         calibrate,        offsetcorrected,  timeGaussPeak',
+ 0.35595703125, 28.30598258972168, 10.083375930786133, -0.05682406921386729, 18.16578258972168, 38.38935852050781)
+
+28.30598258972168 - 10.2 = 18.1 
+
+t1 = gauspeak - time 
+t2 = t1 - offset 
+t2 = gauspeak - time - offset 
+
+
+
+
+
+

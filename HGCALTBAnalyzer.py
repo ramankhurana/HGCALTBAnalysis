@@ -161,6 +161,7 @@ def analyze(timingTree, allhisto_, ampCutIndex, calib):
                 
                 #print ('-------------------------------',cellnumber, str(amplitudeCut[ampCutIndex]))
                 if debug_: print ('-------------------------------',cellnumber, ampCutIndex)
+                ## this will return mean and sigma value, mean will be treated as offset correction. 
                 offsetList    = (calib.CalibationFactor(cellnumber, tt_amp[icell]) )
                 if debug_: print "offset list", offsetList
                 
@@ -209,6 +210,8 @@ def analyze(timingTree, allhisto_, ampCutIndex, calib):
         ## sort the ring and reverse it. 
         sorted_ring1 = sorted(info_ring1, key=operator.attrgetter('amplitude_'))
         sorted_ring1.reverse()
+        if len(sorted_ring1) > 0: 
+            allhisto_['h_HotCellTime'].Fill(sorted_ring1[0].time_calibrate_)
         
         ''' alternate method to sort the python list
         info_ring1.sort(key=operator.attrgetter('amplitude'))
@@ -224,8 +227,12 @@ def analyze(timingTree, allhisto_, ampCutIndex, calib):
         
         ##print 'size of list after cleaning is ', len(filtered_ring1)
         
+        
+        ## make following snippet into a function or module 
+        
         ## calculate linear energy weighted time 
         for iampthreshold_ in config.relativeAmpThreshold_:
+            totalT = -99. 
             if (len(filtered_ring1)>1): 
                 #print ('iampthreshold_, totalT', iampthreshold_, totalT)
                 ampThStr = '_AmpTh_'+str(int(iampthreshold_*100))
@@ -236,17 +243,25 @@ def analyze(timingTree, allhisto_, ampCutIndex, calib):
                         filtered_ring1_AmpTh.append(filtered_ring1[0])
                         continue 
                     ampth = iampthreshold_ * filtered_ring1[0].amplitude_ 
-                    if filtered_ring1[cells].amplitude_ > ampth:
+                    ## no cut when using amplitude threshold to be zero
+                    if iampthreshold_ == 0: 
                         filtered_ring1_AmpTh.append(filtered_ring1[cells])
+                    ## for all other thresholds 
+                    ## each cell should have atleast 
+                    ## 5% of the max amplitude and also pass the given threshold 
+                    else:
+                        if (filtered_ring1[cells].amplitude_ > ampth) & ( (filtered_ring1[cells].amplitude_ > 0.05 * filtered_ring1[0].amplitude_) ):
+                            filtered_ring1_AmpTh.append(filtered_ring1[cells])
                         
                 allhisto_['h_NPads'+ampThStr].Fill(len(filtered_ring1_AmpTh))
-                totalT = HGCALTBUtils.LinearEnergyWeightedTime(filtered_ring1_AmpTh)
+                if len(filtered_ring1_AmpTh) >= 2: totalT = HGCALTBUtils.LinearEnergyWeightedTime(filtered_ring1)
+                
                 if totalT != -99.0:  
                     allhisto_['Totaltime'+ampThStr].Fill(totalT)
                     
-                    ipad_ = str(int(len(filtered_ring1_AmpTh)))
+                    ipad_ = '_'+str(int(len(filtered_ring1_AmpTh)))
                     allhisto_['Totaltime'+ampThStr+'_'+ipad_].Fill(totalT)
-
+                
 
                 print ("event #", ievent, "amp cut =", iampthreshold_, "len = ", len(filtered_ring1_AmpTh), "time =", totalT)
         ## calculate the quadrature weighted time 

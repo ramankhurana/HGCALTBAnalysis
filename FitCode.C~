@@ -1,0 +1,109 @@
+void SaveGraphs(  TString energy = "250"){
+  
+
+  //  TString filename = "AnalysisHisto/electrons_"+energy+"_GeV_5_7_X0.root";
+  TString filename = "electrons_"+energy+"_GeV_5_7_X0.root";
+ 
+  cout << filename <<std::endl;
+  TString dirname = "Dir_"+energy;
+  gSystem->Exec("mkdir "+dirname);
+
+  TString fileout = "Output_"+energy+".root";
+  TFile *fout = new TFile(fileout,"recreate");
+  TFile *f1 = new TFile(filename,"open");
+  f1->cd();
+  TString cellnumber, histoname;
+  TString histo2D;
+  double range_min, range_max,x;
+  int binmax;
+  double par[3];
+  double width[7], cell[7];
+  TCanvas *c1 = new TCanvas ("c1","c1", 700, 500);
+  TF1 *fgaus;
+
+  for (int j=17; j<=23; j++){
+    cellnumber.Form("%d",j);
+    histo2D = "TDCxVsTDCy_withAmpCut_"+cellnumber;
+    TH2F *h4 = (TH2F*) f1->Get(histo2D);
+    c1->cd();
+    //    h2->GetXAxis()->SetTitle("TDCx");
+    //h2->GetXAxis()->SetTitle("TDCy");
+ 
+    h4->Draw("colz");
+        
+    c1->SaveAs(dirname+"/"+histo2D+".pdf");
+
+  }
+
+
+  
+
+    TH2F *h4 = (TH2F*) f1->Get("TDCmap_");
+    c1->cd();
+    //    h2->GetXAxis()->SetTitle("TDCx");
+    //h2->GetXAxis()->SetTitle("TDCy");
+ 
+    h4->Draw("colz");
+        
+    c1->SaveAs(dirname+"/TDCMap_.pdf");
+
+  
+
+
+
+
+
+
+  for ( int i = 17; i <= 23; i++){
+    par[0] =  par[1]= par[2] = 0;
+    cellnumber.Form("%d",i);
+    histoname = "TimePlot_"+cellnumber;
+    TH1F *h2 = (TH1F*) f1->Get(histoname);
+    
+    binmax = h2->GetMaximumBin();
+    x = h2->GetXaxis()->GetBinCenter(binmax);  
+    range_min = x - (2*h2->GetRMS());
+    range_max = x + (2*h2->GetRMS());
+
+    cout << x << "   "<< h2->GetMaximum() <<"  " << h2->GetRMS() <<"   "<<  range_min <<"    "<< range_max <<std::endl;
+    fgaus = new TF1("fgaus","gaus",range_min,range_max);
+    h2->GetXaxis()->SetRangeUser(x-0.2,x+0.2);
+    h2->Fit("fgaus","R");
+    fgaus->GetParameters(&par[0]);
+    cell[i-17] = i ;
+    width[i-17] = par[2];
+    cout << "  "<< par[0] << "  "<<par[1] <<"  "<<par[2] << std::endl;
+    c1->cd();
+    gStyle->SetOptFit(1111111); 
+    h2->Draw();
+        
+    c1->SaveAs(dirname+"/"+histoname+".pdf");
+  }
+  int n = 7;
+  TGraph* gr = new TGraph(n,cell,width);
+  c1->cd();
+  gr->Draw("AC*");
+  c1->SaveAs(dirname+"/resolutionVsCell.pdf");
+
+  fout->cd();  
+    gr->Write();  
+}
+
+
+void FitCode(){
+  std::vector<TString> energyList;
+  energyList.clear();
+  energyList.push_back("20");
+  energyList.push_back("32");
+  energyList.push_back("50");
+  energyList.push_back("100");
+  energyList.push_back("150");
+  energyList.push_back("200");
+  energyList.push_back("250");
+
+  for (int ie = 0; ie < (int) energyList.size(); ie++){
+    TString energy_ = energyList[ie];
+    SaveGraphs(energy_);
+  }
+  
+}

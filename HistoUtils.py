@@ -11,11 +11,15 @@ from neighbours import *
 import config
 
 def defineHistograms(postfix="_"):
+    
     TDCmap = TH2F('TDCmap'+postfix,'TDCmap'+postfix,40,-20,20, 40,-20,20)
     allhisto = {'TDCmap':TDCmap}
     
     h_TDCxVsTDCy_withoutAmpCut = TH2F('TDCxVsTDCy_withoutAmpCut'+postfix,'TDCxVsTDCy_withoutAmpCut',100,-30,30,100,-30,30)
     allhisto ['TDCmapNoAmpCut'] = h_TDCxVsTDCy_withoutAmpCut
+    
+    h_HotCellTime = TH1F('h_HotCellTime','h_HotCellTime',4000,-20.,20.)
+    allhisto['h_HotCellTime'] = h_HotCellTime
     
     for iampTh in config.relativeAmpThreshold_:
         ampThStr = '_AmpTh_'+str(int(iampTh*100))
@@ -27,7 +31,7 @@ def defineHistograms(postfix="_"):
         allhisto['h_NPads'+ampThStr] = h_NPads 
         
         for ipad in [2,3,4,5,6,7]:
-            ipad_ = str(ipad)
+            ipad_ = '_'+str(ipad)
             h_Totaltime_NPads = TH1F('h_Totaltime'+postfix+ampThStr+ipad_,'h_Totaltime', 400, -2, 2)
             #print 'Totaltime'+ampThStr+'_'+ipad_
             allhisto['Totaltime'+ampThStr+'_'+ipad_] = h_Totaltime_NPads
